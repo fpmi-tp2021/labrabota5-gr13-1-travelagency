@@ -233,8 +233,8 @@ void printCrewsEarringByDate(int crewID, char *dateString) {
                      "FROM Crew_members c"
                      "JOIN Flights_performed f"
                      "ON c.Bus_Number = f.Bus_Number"
-                     "HAVING f.Excursion_routes_Final_Point = %s"
-                     "AND c.Bus_Number = %d",
+                     "HAVING f.Excursion_routes_Final_Point = %d"
+                     "AND c.Bus_Number = %s",
             crewID, dateString);
     executeAndCheck(request);
 }
