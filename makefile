@@ -1,5 +1,5 @@
-bin/main: obj/main.o obj/fuctionality.o
-	gcc -o bin/main obj/main.o obj/fuctionality.o
+bin/app: obj/main.o obj/fuctionality.o
+	gcc -o bin/app obj/main.o obj/fuctionality.o
 
 obj/main.o: src/main.c
 	gcc -c src/main.c -o obj/main.o
