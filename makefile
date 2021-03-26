@@ -8,7 +8,7 @@ build/fuctionality.o: src/fuctionality.c
 	gcc -c src/fuctionality.c -o build/fuctionality.o
 
 build/sqlite3.o: src/sqlite3.c
-	gcc -c src/sqlite3.c -o obj/sqlite3.o -lpthread -ldl
+	gcc -c src/sqlite3.c -o build/sqlite3.o -lpthread -ldl
 
 clean:
 	rm -f *.o bin/app
