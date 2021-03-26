@@ -23,13 +23,8 @@ static int callback(void *tmp, int argc, char **argv, char **colName) {
     return 0;
 }
 
-static bool loginCallback(void *tmp, int argc, char **argv, char **colName) {
-    for (int i = 0; i < argc; i++) {
-        printf(" %s = %s\n", colName[i], argv[i] ? argv[i] : "NULL");
-
-    }
-    printf("\n");
-    return 0;
+static bool validateCallback(void *tmp, int argc, char **argv, char **colName) {
+    return !argc;
 }
 
 void openDb() {
@@ -46,8 +41,8 @@ int imageLoadCallback(void *outFile, int argc, char **argv, char **azColName) {
 
 void saveImageById(int id, FILE *outFile) {
     char request[DEFAULT_SIZE];
-    char *error = 0;
-    sprintf(request, "SELECT picture FROM task3 where id=%d;", id);
+    char *error;
+    sprintf(request, "SELECT Image FROM Bus where Number=%d;", id);
 
     sqlite3_stmt *pStmt;
     sqlite3_prepare_v2(db, request, -1, &pStmt, 0);
@@ -64,7 +59,27 @@ void saveImageById(int id, FILE *outFile) {
 }
 
 void updateImageById(int id, FILE *inFile) {
+    fseek(inFile, 0, SEEK_END);
+    int length = ftell(inFile);
+    fseek(inFile, 0, SEEK_SET);
+    char bytes[length + 1];
+    int size = fread(bytes, 1, length, inFile);
+    fclose(inFile);
 
+    sqlite3_stmt *pStmt;
+    char request[DEFAULT_SIZE * 1000];
+    sprintf(request, "UPDATE Bus SET  Image = (?) WHERE id = %d", id);
+
+    if (sqlite3_prepare(db, request, -1, &pStmt, 0) != SQLITE_OK) {
+        fprintf(stderr, "Cannot prepare statement: %s\n", sqlite3_errmsg(db));
+    }
+
+    sqlite3_bind_blob(pStmt, 1, bytes, size, SQLITE_STATIC);
+
+    if (sqlite3_step(pStmt) != SQLITE_DONE) {
+        printf("execution failed: %s", sqlite3_errmsg(db));
+    }
+    sqlite3_finalize(pStmt);
 }
 
 void registerUser(char *login, char *password) {
@@ -77,21 +92,19 @@ void printBusFlightsForTime(int busID, char *startDate, char *endDate) {
     char request[DEFAULT_SIZE];
     sprintf(request, "SELECT Excursion_routes_Name FROM Flights_performed"
                      "WHERE Bus_Number = %d"
-                     "AND Excursion_routes_Starting_point > %s "
-                     "AND Excursion_routes_Final_point < %s", busID, startDate, endDate);
+                     "AND StartDate > %s "
+                     "AND Arrival_Date < %s", busID, startDate, endDate);
     executeAndCheck(request);
 }
 
 void printBusTotalStatistic(int busID) {
     char request[DEFAULT_SIZE];
     sprintf(request, "SELECT b.Name, COUNT(f.ID) AS totalTrips,"
-                     "COUNT(c.Surname) AS totalPassengers,"
+                     "SUM(f.Passengers_number) AS totalPassengers,"
                      " SUM(f.Price) AS totalPrice"
                      "FROM Bus b"
                      "JOIN Flights_performed f"
                      "ON  b.Number = f.Bus_Number"
-                     "JOIN Crew_members c"
-                     "ON  b.Number = c.Bus_Number"
                      "GROUP BY b.Name"
     );
     executeAndCheck(request);
@@ -103,8 +116,8 @@ void printTeamsEarnings(char *startDate, char *endDate) {
                      "FROM Crew_members c"
                      "JOIN Flights_performed f"
                      "ON  c.Bus_Number = f.Bus_Number"
-                     "WHERE Excursion_routes_Starting_point > %s "
-                     "AND Excursion_routes_Final_point < %s", startDate, endDate);
+                     "WHERE StartDate > %s "
+                     "AND Arrival_Date < %s", startDate, endDate);
     executeAndCheck(request);
 }
 
@@ -123,10 +136,12 @@ void printMostExpensiveTripData() {
 
 void printMaximalTotalDistanceBusData() {
     char request[DEFAULT_SIZE];
-    sprintf(request, "SELECT b.Name, b.Mileage, COUNT(c.Surname) AS PassengersCount"
+    sprintf(request, "SELECT b.Name, b.Mileage, SUM(f.Passengers) AS PassengersCount"
                      "FROM Bus b"
                      "JOIN Crew_members c"
                      "ON  b.Number = c.Bus_Number"
+                     "JOIN Flights_performed f"
+                     "ON  b.Number = f.Bus_Number"
                      "GROUP BY b.Name"
                      "HAVING b.Mileage = MAX(b.Mileage)"
     );
@@ -135,7 +150,6 @@ void printMaximalTotalDistanceBusData() {
 
 
 void addBus(bus bus) {
-
     char request[DEFAULT_SIZE];
     sprintf(request, "INSERT into Bus(Number, Name, Mileage) VALUES(%s, %s, %lf);", bus.number, bus.name,
             bus.totalDistance);
@@ -154,8 +168,8 @@ void addMember(struct crew_member member) {
 void addCompletedTrip(struct completed_trip trip) {
     char request[DEFAULT_SIZE];
     sprintf(request, "INSERT into Flights_performed(ID, "
-                     "Bus_Number, Excursion_routes_Name, Excursion_routes_Starting_point"
-                     ", Excursion_routes_Final_point, Passengers_number, Price) "
+                     "Bus_Number, Excursion_routes_Name, StartDate"
+                     ", Arrival_Date, Passengers_number, Price) "
                      "VALUES(%d, %s, %s, %s, %s, %d, %lf);", trip.id, trip.busNumber, trip.tripName,
             trip.arrivalDate, trip.appearDate, trip.passengersCount,
             trip.price);
@@ -211,7 +225,28 @@ void updateMember(struct crew_member member, int id) {
     executeAndCheck(request);
 }
 
-//void checkInfo(struct tour);
+void checkInfo(struct tour tour) {
+    bool infoValid;
+    char request[DEFAULT_SIZE];
+    sprintf(request, "SELECT * FROM Flights_performed"
+                     "WHERE Excursion_routes_Name = %s"
+                     "AND Excursion_routes_Starting_point = %s"
+                     "AND Excursion_routes_Final_point = %s",
+            tour.name, tour.startPoint, tour.destination);
+
+    infoValid = sqlite3_exec(db, request, validateCallback, 0, NULL);
+    if (infoValid) {
+        char addRequest[DEFAULT_SIZE];
+        sprintf(addRequest, "INSERT INTO Excursion_routes(Name, Starting_point, Final_point)"
+                            "VALUES(%s,%s,%s)",
+                tour.name, tour.startPoint, tour.destination);
+    }
+    else{
+        printf("%s", "Data is invalid!");
+    }
+}
+
+
 void printCrewsEarrings(double persentage, char *startDate, char *endDate) {
     char request[DEFAULT_SIZE];
     sprintf(request, "CREATE VIEW Crew_Earnings AS"
@@ -221,8 +256,8 @@ void printCrewsEarrings(double persentage, char *startDate, char *endDate) {
                      "JOIN Flights_performed f"
                      "ON c.Bus_Number = f.Bus_Number"
                      "GROUP BY c.Surname"
-                     "HAVING f.Excursion_routes_Starting_Point > %s"
-                     "AND f.Excursion_routes_Final_Point < %s",
+                     "HAVING f.StartDate > %s"
+                     "AND f.Arrival_Date < %s",
             persentage, startDate, endDate);
     executeAndCheck(request);
 }
@@ -233,9 +268,9 @@ void printCrewsEarringByDate(int crewID, char *dateString) {
                      "FROM Crew_members c"
                      "JOIN Flights_performed f"
                      "ON c.Bus_Number = f.Bus_Number"
-                     "HAVING f.Excursion_routes_Final_Point = %s"
+                     "HAVING f.Arrival_Date = %s"
                      "AND c.Bus_Number = %d",
-            crewID, dateString);
+            dateString, crewID);
     executeAndCheck(request);
 }
 
