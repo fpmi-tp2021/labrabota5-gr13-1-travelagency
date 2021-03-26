@@ -23,7 +23,7 @@ static int callback(void *tmp, int argc, char **argv, char **colName) {
     return 0;
 }
 
-static bool validateCallback(void *tmp, int argc, char **argv, char **colName) {
+static int validateCallback(void *tmp, int argc, char **argv, char **colName) {
     return !argc;
 }
 
@@ -226,7 +226,7 @@ void updateMember(struct crew_member member, int id) {
 }
 
 void checkInfo(struct tour tour) {
-    bool infoValid;
+    int infoValid;
     char request[DEFAULT_SIZE];
     sprintf(request, "SELECT * FROM Flights_performed"
                      "WHERE Excursion_routes_Name = %s"

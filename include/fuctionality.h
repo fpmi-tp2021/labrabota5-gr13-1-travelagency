@@ -18,7 +18,7 @@ void updateImageById(int id, FILE *inFile);
 
 void registerUser(char *login, char *password);
 
-bool login(char *login, char *password);
+int login(char *login, char *password);
 
 void printBusTotalStatistic(int busID);
 
