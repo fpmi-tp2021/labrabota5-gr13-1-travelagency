@@ -1,4 +1,2 @@
 /cmake-build-debug/
 /CMakeLists.txt
-/include/sqlite3.h
-/src/sqlite3.c
