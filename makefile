@@ -1,4 +1,4 @@
-bin/app: obj/main.o obj/fuctionality.o build/sqlite3.o
+bin/app: obj/main.o build/fuctionality.o build/sqlite3.o
 	gcc -o bin/app build/main.o build/fuctionality.o build/sqlite3.o -lpthread -ldl
 
 build/main.o: src/main.c
