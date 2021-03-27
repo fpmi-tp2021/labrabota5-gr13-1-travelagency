@@ -168,11 +168,11 @@ void printMaximalTotalDistanceBusData() {
 }
 
 
-void addBus(bus bus) {
+int addBus(bus bus) {
     char request[DEFAULT_SIZE];
     sprintf(request, "INSERT into Bus(Number, Name, Mileage) VALUES(%s, %s, %lf);", bus.number, bus.name,
             bus.totalDistance);
-    executeAndCheck(request);
+    return executeAndCheck(request);
 }
 
 void addMember(struct crew_member member) {
@@ -293,9 +293,11 @@ void printCrewsEarringByDate(int crewID, char *dateString) {
     executeAndCheck(request);
 }
 
-void executeAndCheck(char *request) {
+int executeAndCheck(char *request) {
     char *error = 0;
     if (sqlite3_exec(db, request, callback, 0, &error) != SQLITE_OK) {
         printf("%s\n", error);
+        return -1;
     }
+    return SQLITE_OK;
 }

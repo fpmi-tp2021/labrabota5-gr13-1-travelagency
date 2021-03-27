@@ -28,7 +28,14 @@ int testLogin(){
     }
     return S_OK;
 }
-
+int testAddBus()
+{
+    struct bus b;
+    b.name = "Bus4";
+    b.number = 5;
+    b.totalDistance = 7f;
+    return addBus(b);
+}
 
 int run_tests() {
     if (E_FAIL == testOpen()) {
@@ -37,6 +44,10 @@ int run_tests() {
     }
     if (E_FAIL == testLogin()) {
         printf("failed testLogin()\n");
+        return E_FAIL;
+    }
+    if (E_FAIL == testAddBus()) {
+        printf("failed testAddBus()\n");
         return E_FAIL;
     }
     return S_OK;
