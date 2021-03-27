@@ -30,7 +30,7 @@ void printMostExpensiveTripData();
 
 void printMaximalTotalDistanceBusData();
 
-void addBus(bus bus);
+int addBus(bus bus);
 
 void addMember(struct crew_member member);
 
