@@ -32,8 +32,8 @@ int testAddBus()
 {
     struct bus b;
     b.name = "Bus4";
-    b.number = 5;
-    b.totalDistance = 7f;
+    b.number = "5";
+    b.totalDistance = 7;
     return addBus(b);
 }
 
