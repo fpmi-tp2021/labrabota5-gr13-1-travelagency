@@ -7,7 +7,7 @@
 int currentExecutionResult = -1;
 struct sqlite3 *db;
 
-void executeAndCheck(char *request);
+int executeAndCheck(char *request);
 
 void executeRemove(int id, char *table) {
     char request[DEFAULT_SIZE];
@@ -293,9 +293,11 @@ void printCrewsEarringByDate(int crewID, char *dateString) {
     executeAndCheck(request);
 }
 
-void executeAndCheck(char *request) {
+int executeAndCheck(char *request) {
     char *error = 0;
     if (sqlite3_exec(db, request, callback, 0, &error) != SQLITE_OK) {
         printf("%s\n", error);
+        return -1;
     }
+    return SQLITE_OK;
 }
