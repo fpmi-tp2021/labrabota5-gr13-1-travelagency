@@ -4,6 +4,7 @@
 
 #define DEFAULT_SIZE 255
 
+int currentExecutionResult = -1;
 struct sqlite3 *db;
 
 void executeAndCheck(char *request);
@@ -23,17 +24,35 @@ static int callback(void *tmp, int argc, char **argv, char **colName) {
     return 0;
 }
 
+static int loginCallback(void *tmp, int argc, char **argv, char **colName) {
+    currentExecutionResult = argv != NULL ? 0 : -1;
+    return 0;
+}
+
 static int validateCallback(void *tmp, int argc, char **argv, char **colName) {
     return !argc;
 }
 
-void openDb() {
-    int openResult = sqlite3_open("../indentifier.sqlite", &db);
+int openDb() {
+    int openResult = sqlite3_open("../TravelAgency.sqlite", &db);
     if (openResult) {
         printf("Cant open db!\n");
+        return -1;
     }
+    return 0;
 }
 
+int login(char *login, char * password){
+    currentExecutionResult = -1;
+    char request[DEFAULT_SIZE];
+    sprintf(request, "SELECT * FROM Users WHERE Login='%s' AND Password='%s';", login, password);
+    char *error = 0;
+    if (sqlite3_exec(db, request, loginCallback, 0, &error) != SQLITE_OK) {
+        printf("%s\n", error);
+        return -1;
+    }
+    return currentExecutionResult;
+}
 
 int imageLoadCallback(void *outFile, int argc, char **argv, char **azColName) {
     fprintf((FILE *) outFile, "%s", argv[0]);

@@ -1505,12 +1505,12 @@ Final_point</ColNames>
     </column>
     <column id="529" parent="174" name="Login">
       <Position>2</Position>
-      <DataType>TEXT|0s</DataType>
+      <DataType>VARCHAR(255)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
     <column id="530" parent="174" name="Password">
       <Position>3</Position>
-      <DataType>TEXT|0s</DataType>
+      <DataType>VARCHAR(255)|0s</DataType>
       <NotNull>1</NotNull>
     </column>
     <key id="531" parent="174">

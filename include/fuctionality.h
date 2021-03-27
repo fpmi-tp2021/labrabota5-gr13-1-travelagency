@@ -8,7 +8,7 @@
 #include "crew_member.h"
 
 
-void openDb();
+int openDb();
 
 int imageLoadCallback(void *outFile, int argc, char **argv, char **azColName);
 
