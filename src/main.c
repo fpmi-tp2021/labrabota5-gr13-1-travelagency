@@ -28,7 +28,14 @@ int testLogin(){
     }
     return S_OK;
 }
-
+int testAddBus()
+{
+    struct bus b;
+    b.name = "Bus4";
+    b.number = "5";
+    b.totalDistance = 7;
+    return addBus(b);
+}
 
 int run_tests() {
     if (E_FAIL == testOpen()) {
@@ -39,6 +46,10 @@ int run_tests() {
         printf("failed testLogin()\n");
         return E_FAIL;
     }
+    if (E_FAIL == testAddBus()) {
+        printf("failed testAddBus()\n");
+        return E_FAIL;
+    }
     return S_OK;
 }
 
@@ -47,7 +58,6 @@ int run_tests() {
 	This main function only runs all the test code.
     If successful it returns S_OK which is equal to the numerical value of 0.
  	Any other value is considered a failure.
-
  */
 int main()
 {
