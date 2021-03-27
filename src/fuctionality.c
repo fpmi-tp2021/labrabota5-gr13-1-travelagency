@@ -168,11 +168,11 @@ void printMaximalTotalDistanceBusData() {
 }
 
 
-void addBus(bus bus) {
+int addBus(bus bus) {
     char request[DEFAULT_SIZE];
     sprintf(request, "INSERT into Bus(Number, Name, Mileage) VALUES(%s, %s, %lf);", bus.number, bus.name,
             bus.totalDistance);
-    executeAndCheck(request);
+    return executeAndCheck(request);
 }
 
 void addMember(struct crew_member member) {
