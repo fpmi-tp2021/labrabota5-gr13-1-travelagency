@@ -20,5 +20,17 @@
         </library>
       </libraries>
     </data-source>
+    <data-source source="LOCAL" name="TravelAgency" uuid="30f6e175-fa0e-4f18-b62f-617cc6838916">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:D:\JetBrains\CLionProjects\labrabota5-gr13-1-travelagency\TravelAgency.sqlite</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+      <libraries>
+        <library>
+          <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/Xerial SQLiteJDBC/3.34.0/sqlite-jdbc-3.34.0.jar</url>
+        </library>
+      </libraries>
+    </data-source>
   </component>
 </project>
