@@ -8,7 +8,7 @@ labrabota5-gr13-1-travelagency created by GitHub Classroom
 
 - After installation, the application must be launched and the database must be populated with your data. After filling out the base, you can start working on it.
 
-- Andrey Kuksa - team leader, system development, drawing up diagrams; Rodion Rutkevich - design of the database, as well as its code. Development of schemes.; Evgeny Belitsky - team leader, system development.
+- Andrey Kuksa - team leader, system development, drawing up diagrams; Rodion Rutkevich - design of the database, as well as its code. Development of schemes. Writing documentation; Evgeny Belitsky - system development, drawing up diagrams.
 
 
 
