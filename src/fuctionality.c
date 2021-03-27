@@ -7,7 +7,7 @@
 int currentExecutionResult = -1;
 struct sqlite3 *db;
 
-void executeAndCheck(char *request);
+int executeAndCheck(char *request);
 
 void executeRemove(int id, char *table) {
     char request[DEFAULT_SIZE];
